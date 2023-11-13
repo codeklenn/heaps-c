@@ -1,0 +1,399 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "BST.h"
+
+// a recursive subroutine to display the BST in tree mode
+void showTreeHelper(BST_NODE* node, int tabs){
+
+    if(!node) return; // node is null, do nothing
+    showTreeHelper(node->right, tabs + 1);
+    for(int i=0; i<tabs; i++) printf("\t");
+    printf("%d(%d)\n", node->key, node->height);
+    showTreeHelper(node->left, tabs + 1);
+
+}
+
+void showTree(BST* B){
+    showTreeHelper(B->root, 0);
+}
+
+/***********************************************************************/
+/* Copy your previous function definitions for the functions in BST.h. */
+/* PASTE THEM BELOW THIS COMMENT.                                      */
+/***********************************************************************/
+
+//your implementation for the functions in BST.h below !!!
+int greater(int a, int b){
+    if(a>b){
+        return a;
+    }
+    return b;
+}
+
+//createBSTNode function (creates a BST node)
+BST_NODE* createBSTNode(int key, BST_NODE* L, BST_NODE* R, BST_NODE* P){
+    BST_NODE* tempNode = (BST_NODE*)malloc(sizeof(BST_NODE));
+    //set the values of the node
+    tempNode->key = key;
+    tempNode->left = L;
+    tempNode->right = R;
+    tempNode->parent = P;
+    tempNode->height = 0;
+    //height (?)
+    return tempNode;
+}
+
+//createBST function (creates a BST tree)
+BST* createBST(int max){
+    BST* tempTree = (BST*)malloc(sizeof(BST));
+    tempTree->maxSize = max;
+    tempTree->size = 0;
+    tempTree->root = NULL;
+    return tempTree;
+}
+
+void heightNormalizer(BST_NODE* node){ //Takes in a node (most likely a parent)
+    BST_NODE* HEIGHT_NORMALIZER = node;
+    while(HEIGHT_NORMALIZER != NULL){ //While loop for normalizing the height
+        if(HEIGHT_NORMALIZER->right == NULL && HEIGHT_NORMALIZER->left == NULL){
+            HEIGHT_NORMALIZER->height = 0;
+        }
+        else if(HEIGHT_NORMALIZER->left != NULL && HEIGHT_NORMALIZER->right == NULL){
+            HEIGHT_NORMALIZER->height = HEIGHT_NORMALIZER->left->height + 1;
+        }
+        else if(HEIGHT_NORMALIZER->left == NULL && HEIGHT_NORMALIZER->right != NULL){
+            HEIGHT_NORMALIZER->height = HEIGHT_NORMALIZER->right->height + 1;
+        }
+        else{
+            HEIGHT_NORMALIZER->height = greater(HEIGHT_NORMALIZER->left->height,HEIGHT_NORMALIZER->right->height) + 1;
+        }
+        HEIGHT_NORMALIZER = HEIGHT_NORMALIZER->parent;
+    }
+}
+//isEmpty function (checks whether the BST tree is empty)
+int isEmpty(BST* B){
+    if(B->size == 0){
+        return 1;
+    }
+    return 0;
+}
+
+//isFull function (checks whether the BST tree is full)
+int isFull(BST* B){
+    if(B->size >= B->maxSize){
+        return 1;
+    }
+    return 0;
+}
+
+//insert function (inserts the node to the BST tree)
+void insert(BST* B, BST_NODE* node){
+    int maxHeight;
+    //If tree is empty, then make inserted node as the root
+    if(isEmpty(B)){
+        B->root = node;
+        (B->size)++;
+        return;
+    }
+    //If tree is not empty, then insert node according to its key value.
+    //Create a pointer that traverses through the tree to find the position where to insert
+    //the value.
+    BST_NODE* traverser = B->root;
+    //Make a parent pointer so we can track the value before.
+    BST_NODE* parentTraverser = NULL;
+    while(traverser != NULL){
+        parentTraverser = traverser;
+        if(node->key < traverser->key){
+            traverser = traverser->left;
+        }
+        else{
+            traverser = traverser->right;
+        }
+    }
+    //After the while loop ends, it means that we have found the position where to insert the node.
+    traverser = node;
+    //Point the parent of the pointer to the parentTraverser we have initialized recently
+    traverser->parent = parentTraverser;
+
+    //checks whether the traverser key is < or > parentTraverser key
+    if(traverser->key < parentTraverser->key){
+        parentTraverser->left = traverser;
+    }
+    else{
+        parentTraverser->right = traverser;
+    }
+    //This while loop checks what the maximum value of their two children
+    while(parentTraverser != NULL){
+        if(parentTraverser->left== NULL && parentTraverser->right == NULL){
+            parentTraverser->height = traverser->height + 1;
+        }
+        else if(parentTraverser->left == NULL){
+            parentTraverser->height = parentTraverser->right->height+1;
+        }
+        else if(parentTraverser->right == NULL){
+            parentTraverser->height = parentTraverser->left->height+1;
+        }
+        else{
+            parentTraverser->height = greater(parentTraverser->left->height,parentTraverser->right->height) + 1;
+        }
+        parentTraverser = parentTraverser->parent;
+    }
+    (B->size)++;
+}
+
+BST_NODE* search(BST* B, int key){
+    BST_NODE* traverser = B->root;
+    while(traverser != NULL){ 
+        if(key == traverser->key){
+            //If key is found, return the pointer
+            return traverser;
+        }
+        //traversal through the array:
+        if(key < traverser->key){
+            traverser = traverser->left;
+        }
+        else{
+            traverser = traverser->right;
+        }
+    }
+    //If number is not found, then return null.
+    return NULL;
+}
+//Function for in-order traversal
+void inorderWalk(BST* B){
+    BST_NODE* traverser = B->root;
+    //Note: if you want to initialize some values in a structure. Allocate first some memory.
+    BST* tempTree = (BST*)malloc(sizeof(BST));
+    if(traverser == NULL){ //base case
+        return;
+    }
+    //Traverse to the left
+    tempTree->root = traverser->left;
+    inorderWalk(tempTree);
+    //Print the key
+    printf("%d ", traverser->key);
+    //Traverse through the right
+    tempTree->root = traverser->right;
+    inorderWalk(tempTree);
+    free(tempTree);
+    return;
+}
+
+void preorderWalk(BST* B){
+    BST_NODE* traverser = B->root;
+    BST* tempTree = (BST*)malloc(sizeof(BST));
+
+    if(traverser == NULL){ //base case
+        return;
+    }
+    //First, print the key.
+    printf("%d ", traverser->key);
+    //Traverse through the left
+    tempTree->root = traverser->left;
+    preorderWalk(tempTree);
+    //Traverse through the right
+    tempTree->root = traverser->right;
+    preorderWalk(tempTree);
+    free(tempTree);
+    return;
+}
+
+void postorderWalk(BST* B){
+    BST_NODE* traverser = B->root;
+    BST* tempTree = (BST*)malloc(sizeof(BST));
+
+    if(traverser == NULL){ //base case
+        return;
+    }
+    //Traverse through the left
+    tempTree->root = traverser->left;
+    postorderWalk(tempTree);
+    //Traverse through the right
+    tempTree->root = traverser->right;
+    postorderWalk(tempTree);
+    //Last, print the key
+    printf("%d ", traverser->key);
+}
+
+BST_NODE* minimum(BST_NODE* node){
+    BST_NODE* traverser = node;
+    while(traverser->left != NULL){
+        traverser = traverser->left;
+    }
+    return traverser;
+}
+
+BST_NODE* maximum (BST_NODE* node){
+    BST_NODE* traverser = node;
+    while(traverser->right != NULL){
+        traverser = traverser->right;
+    }
+    return traverser;
+}
+
+void clear(BST* B){
+    BST_NODE* traverser = B->root;
+    BST* tempTree = (BST*)malloc(sizeof(BST)); 
+    BST_NODE* HEIGHT_NORMALIZER;
+    if(traverser == NULL){ //BASE CASE:
+        return;
+    }
+    tempTree->root = traverser->left;
+    clear(tempTree);
+    tempTree->root = traverser->right;
+    clear(tempTree);
+    free(traverser);
+    B->size = 0;
+    B->root = NULL;
+    return;
+}
+
+int delete(BST* B, int key){
+    if(isEmpty(B)){
+        printf("There is nothing to delete.");
+        return -1; 
+    }
+    printf("num: %d", B->size);
+    BST_NODE* traverser = search(B,key);
+    int deleted_key = traverser->key;
+    BST_NODE* HEIGHT_NORMALIZER; //Will be initialized later on, so that we can normalize the height at the end
+    if(traverser == B->root && B->size == 1){ //If traverser is the root node to be deleted, and the root node does not have any children
+        free(B->root);
+        B->size = 0;
+        B->root = NULL;
+        return deleted_key;
+    }
+    //Subcase of root node. If the root node has a left or right child.
+    if(traverser == B->root && B->root->left != NULL && B->root->right == NULL){
+        B->root = B->root->left;
+        B->root->parent = NULL;
+        B->size--;
+        return deleted_key;
+    }
+    if(traverser == B->root && B->root->left == NULL && B->root->right != NULL){
+        B->root = B->root->right;
+        B->root->parent = NULL;
+        B->size--;
+        return deleted_key;
+    }
+    //Case 1: If there are no children
+    if(traverser->left == NULL && traverser->right == NULL){
+        if(traverser->key < traverser->parent->key){
+            HEIGHT_NORMALIZER = traverser->parent;
+            traverser->parent->left = NULL;
+            free(traverser);
+            B->size--;
+        }
+        else{
+            HEIGHT_NORMALIZER = traverser->parent;
+            traverser->parent->right = NULL;
+            free(traverser);
+            B->size--;
+        }
+    }
+    //Case 2: If there exactly one child:
+    else if(traverser->left != NULL && traverser->right == NULL){ //Left child is present on the node to be deleted
+        if(traverser->key < traverser->parent->key){ //Check whether the node to be deleted is a left/right child of its parent (in this case, traverser is left child)
+            HEIGHT_NORMALIZER = traverser->parent;
+            traverser->parent->left = traverser->left; //Let the left child of traverser, be the new left child of parent
+            traverser->left->parent = traverser->parent; //Let the parent of traverser, be the new parent of left child of traverser
+            traverser->left = NULL; //Let traverser's left child point to NULL
+            free(traverser); //Free the traverser
+            B->size--;
+        }
+        else{ //Traverser is right child
+            HEIGHT_NORMALIZER = traverser->parent;
+            traverser->parent->right = traverser->left; //Let the left child of traverser be the new right child of parent
+            traverser->left->parent = traverser->parent; //Let the parent of the traverser, be the new parent of left child of traverser
+            traverser->left = NULL; //Let traverser's left child point to NULL
+            free(traverser); //Free the traverser
+            B->size--;
+        }
+    }
+    else if(traverser->left == NULL && traverser->right != NULL){ //Right child is present on the node to be deleted
+        if(traverser->key < traverser->parent->key){ //Check whether traverser is left/right child of its parent (traverser is left child)
+            HEIGHT_NORMALIZER = traverser->parent;
+            traverser->parent->left = traverser->right; //Let left child of parent be the right child of traverser
+            traverser->right->parent = traverser->parent; //Let traverser's parent be the new parent of traverser's right child
+            traverser->right = NULL; //Let right of traverser point to NULL
+            free(traverser); //Free
+            B->size--;
+        }
+        else{//Traverser is right child
+            HEIGHT_NORMALIZER = traverser->parent;
+            traverser->parent->right = traverser->right;
+            traverser->right->parent = traverser->parent;
+            traverser->right = NULL;
+            free(traverser);
+            B->size--;
+        }
+    }
+    //Case 3: There are two children:
+    else{
+        HEIGHT_NORMALIZER = traverser->parent;
+        BST_NODE* successor = minimum(traverser->right); //Find the minimum value on its right subtree
+        delete(B,successor->key); //Using recursion, call the function to delete the successor according to its Case 1 and Case 2
+        traverser->key = successor->key;
+    }
+    while(HEIGHT_NORMALIZER != NULL){ //While loop for normalizing the height
+        if(HEIGHT_NORMALIZER->right == NULL && HEIGHT_NORMALIZER->left == NULL){
+            HEIGHT_NORMALIZER->height = 0;
+        }
+        else if(HEIGHT_NORMALIZER->left != NULL && HEIGHT_NORMALIZER->right == NULL){
+            HEIGHT_NORMALIZER->height = HEIGHT_NORMALIZER->left->height + 1;
+        }
+        else if(HEIGHT_NORMALIZER->left == NULL && HEIGHT_NORMALIZER->right != NULL){
+            HEIGHT_NORMALIZER->height = HEIGHT_NORMALIZER->right->height + 1;
+        }
+        else{
+            HEIGHT_NORMALIZER->height = greater(HEIGHT_NORMALIZER->left->height,HEIGHT_NORMALIZER->right->height) + 1;
+        }
+        HEIGHT_NORMALIZER = HEIGHT_NORMALIZER->parent;
+    }
+    return deleted_key;
+    
+}
+
+BST_NODE* predecessor(BST_NODE* node){
+    BST_NODE* traverser = node;
+    //Case 1: if the node has a left subtree
+    if(traverser->left != NULL){
+        return maximum(traverser->left);
+    }
+    //Case 2: if the node has a right subtree
+    while(traverser != NULL){
+        //This means that there is no predecessor:
+        if(traverser->parent == NULL){
+            return NULL;
+        }
+        //Checks whether the traverser is a right child of its parent (if it is, then the predecessor has been found)
+        if(traverser->parent->right == traverser){
+            break;
+        }
+        traverser = traverser->parent;
+    }
+    //Returns the node of the parent traverser
+    return traverser->parent;
+}
+
+BST_NODE* successor(BST_NODE* node){
+    BST_NODE* traverser = node;
+    //Case 1: if the node has a left subtree
+    if(traverser->right != NULL){
+        return minimum(node->right);
+    }
+    //Case 2: if the node has a right subtree
+    while(traverser != NULL){
+        //This means that there is no successor:
+        if(traverser->parent == NULL){
+            return NULL;
+        }
+        //Checks whether the traverser is a left child of its parent (if it is, then the successor has been found)
+        if(traverser->parent->left == traverser){
+            break;
+        }
+        traverser = traverser->parent;
+    }
+    //Returns the node of the parent traverser
+    return traverser->parent;
+}
