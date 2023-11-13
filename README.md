@@ -1,5 +1,5 @@
 # heaps-c
-Simple C program for simulating and showing a heap data structure/
+Simple C program for simulating and showing a heap data structure
 
 Necessary functions to create:
 - insert()
