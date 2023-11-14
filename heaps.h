@@ -1,43 +1,103 @@
+// ___  ____    _  _ ____ ___    ____ ___  _ ___    ___ _  _ _ ____    ____ _ _    ____ 
+// |  \ |  |    |\ | |  |  |     |___ |  \ |  |      |  |__| | [__     |___ | |    |___ 
+// |__/ |__|    | \| |__|  |     |___ |__/ |  |      |  |  | | ___]    |    | |___ |___ 
+//
+
+#ifndef _HEAP_H_
+#define _HEAP_H_
+
+typedef struct heap_tag {
+  int *heap;
+  int size;
+  int maxSize;
+} HEAP;
 
 
-#ifndef _HEAPS_H_
-#define _HEAPS_H_
+/*
+ *  PRINT HEAP
+ *  requirements:
+      a non-null HEAP pointer
+      a non-empty *heap
+ *  results:
+      prints the heap (rotated +90 degrees)...
+*/
+
+void printHeap(HEAP *H);
 
 
+/*
+ *  CREATE HEAP
+ *  requirements: none
+ *  results:
+      initializes fields of the structure
+      returns the created heap
+*/
+HEAP* createHeap(int maxSize);
 
-#include <stdlib.h>
 
-// Structure representing a min-heap
-typedef struct MINHEAP{
-    int* array;    // Array to store heap elements
-    int capacity;  // Maximum capacity of the heap
-    int size;      // Current size of the heap
-} MINHEAP;
+/*
+ *  IS FULL
+ *  requirements: none
+ *  results:
+      return 1 if the heap is full
+      otherwise return 0
+*/
+int isFull(HEAP *H);
 
-// Function to initialize a min-heap
-MINHEAP *initializeHeap(int capacity);
 
-// Function to insert a new element into the min-heap
-void insert(MINHEAP* heap, int value);
+/*
+ *  IS EMPTY
+ *  requirements: none
+ *  results:
+      return 1 if the heap is empty
+      otherwise return 0
+*/
+int isEmpty(HEAP *H);
 
-// Function to delete the minimum element from the min-heap
-int deleteMin(MINHEAP* heap);
 
-// Function to heapify a subtree rooted with the given index
-void heapify(MINHEAP* heap, int index);
+/*
+ *  CLEAR
+ *  requirements:
+      a non-null HEAP pointer
+      a non-empty *heap
+ *  results:
+      deletes all the items in the heap
+*/
+void clear(HEAP *H);
 
-// Function to build a min-heap from an array of elements
-MINHEAP *buildHeap(int* array, int size);
 
-// Function to get the minimum element from the min-heap without deleting it
-int getMin(MINHEAP* heap);
+/*
+ *  INSERT
+ *  requirements:
+      a non-null HEAP pointer
+      a non-full *heap
+ *  results:
+      inserts `key` to the MIN HEAP `heap`
+*/
+void insert(HEAP *H, int key);
 
-// Function to check if the min-heap is empty
-int isEmpty(MINHEAP* heap);
 
-// Function to check if the min-heap is full
-int isFull(MINHEAP* heap);
+/*
+ *  DELETE M
+ *  requirements:
+      a non-null HEAP pointer
+      a non-empty *heap
+ *  results:
+	    removes the minimum value (root) from the MIN HEAP `heap`
+      returns the deleted value
+*/
+int deleteM(HEAP *H);
 
-// Function to free the memory allocated for the min-heap
-void destroyHeap(MINHEAP* heap);
+
+/*
+ *  HEAP SORT
+ *  requirements:
+      a non-null HEAP pointer
+      a non-empty *heap
+ *  results:
+ 	    returns an array containing the sorted (descending order) values of the MIN HEAP `heap`
+	    IMPORTANT: MUST NOT MODIFY ORIGINAL HEAP
+*/
+int *heapSort(HEAP *H);
+
 #endif
