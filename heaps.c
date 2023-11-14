@@ -4,7 +4,7 @@
  * Program Description: Simple C program for simulating and showing heaps. 
 */
 
-#include "heap.h"
+#include "heaps.h"
 #include <stdio.h>
 #include <stdlib.h>
 
