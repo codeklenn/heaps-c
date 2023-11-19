@@ -1,6 +1,4 @@
 /*
- * Name: Klenn Jakek V. Borja	
- * Lab Section: U1L
  * Program Description: Simple C program for simulating and showing heaps. 
 */
 
@@ -109,35 +107,60 @@ int deleteM(HEAP *H){
     H->heap[H->size] = deleted_key;
     H->size--;
     //Check whether it violates the min-heap rule. If yes, do a percolate up.
+
     int tempIndex = 1; //starting traversal index
+	H->heap[tempIndex] = temp;
     int key = H->heap[tempIndex]; //keep track of the key that will be swapped
-    while(tempIndex < H->size){
-		if(H->size == 1){ //If no children (or deleting the root node)
+	printf("%d", H->size);
+    while(tempIndex < H->size){ //it ends when the it is already in the correct position
+		temp = H->heap[tempIndex];
+		if(tempIndex*2 > H->size){
 			break;
+		}
+		//If there is only one child (or the child is the last leaf node):
+
+		if(tempIndex*2 == H->size){ //Checks whether there is only one child
+			printf("a\n");
+			if(H->heap[tempIndex] > H->heap[tempIndex*2]){ //If parent is greater than child
+				H->heap[tempIndex] = H->heap[tempIndex*2]; //swap
+				H->heap[tempIndex*2] = temp;
+				tempIndex = tempIndex*2;
+				break;
+			}
+			else{
+				break;
+			}
+		}
+		//If there are two children:
+		//Check first which is smaller , the left or the right.
+		if(H->heap[tempIndex*2] < H->heap[tempIndex*2+1]){ //If the left is smaller
+			//Check if parent is greater than the left:
+			printf("b\n");
+				printf("%d and %d \n", H->heap[tempIndex], H->heap[tempIndex*2]);
+
+			if(H->heap[tempIndex] > H->heap[tempIndex*2]){
+				H->heap[tempIndex] = H->heap[tempIndex*2];
+				H->heap[tempIndex*2] = temp;
+				tempIndex = tempIndex*2;
+			}
+			else{ //If not, then break since the parent has found its position
+			printf("f\n");
+				break;
+			}
+		}
+		else{ //The right is smaller
+			printf("c\n");
+			printf("%d and %d \n", H->heap[tempIndex], H->heap[(tempIndex*2)+1]);
+			//Check if parent is greater than the right:
+			if(H->heap[tempIndex] > H->heap[(tempIndex*2)+1]){
+				H->heap[tempIndex] = H->heap[(tempIndex*2)+1];
+				H->heap[tempIndex*2+1] = temp;
+				tempIndex = (tempIndex*2)+1;
+			}
+			else{ //If not, then break. Parent has found its position.
+				break;
+			}
 		} 
-        //get the greater of the child:
-        if(tempIndex*2 > H->size){ //if no left child
-            break;
-        }
-        else if(tempIndex*2 == H->size){ //if only one child
-            if(H->heap[tempIndex*2] < H->heap[tempIndex]){ //if right child is smaller
-                H->heap[tempIndex] = H->heap[tempIndex*2];
-                tempIndex = tempIndex*2;
-            }
-            else{ //if left child is smaller
-                break;
-            }
-        }
-        else{ //if two children
-            if(H->heap[tempIndex*2] < H->heap[(tempIndex*2)+1]){ //if left child is smaller
-                H->heap[tempIndex] = H->heap[tempIndex*2];
-                tempIndex = tempIndex*2;
-            }
-            else{ //if right child is smaller
-                H->heap[tempIndex] = H->heap[(tempIndex*2)+1];
-                tempIndex = (tempIndex*2)+1;
-            }
-        }
     }
     H->heap[tempIndex] = temp; //overwrite the root node with the value that was just deleted
     return deleted_key;
@@ -195,10 +218,9 @@ int main(){
 				for(key=1; key <= H->maxSize; key++){
 					if(sorted[key] == '\0') break;
 					printf("%4d", sorted[key]);
-					
 				}
-				printf("\n");
 				free(sorted);
+				printf("\n");
 				break;
 			case 'Q':
 				free(H->heap);
