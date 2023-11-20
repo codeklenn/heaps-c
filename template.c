@@ -172,7 +172,11 @@ int *heapSort(HEAP *H){
 	int tempSize = H->size; //Create a placeholder variable for containing the size of our main heap
 	HEAP *tempHeap = createHeap(H->maxSize);
 	tempHeap->size = tempSize;
-	tempHeap->heap = H->heap; //copy its contents
+	tempHeap->heap = (int*)malloc((tempHeap->maxSize+1)*sizeof(int)); //we allocate memory as we want to create another array
+	for(int i = 1; i <= H->size; i++){ //copy the contents of the heap by iterating through the original array and initializing the temporary heap
+		tempHeap->heap[i] = H->heap[i];
+	}
+
 	int *sorted_array = (int*)malloc((tempSize+1)*sizeof(int));
 	for(int i = tempSize; i >= 1; i--){ //Iterate through the array, then delete accordingly.
 		sorted_array[i]= deleteM(tempHeap);
