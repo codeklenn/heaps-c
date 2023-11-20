@@ -111,7 +111,6 @@ int deleteM(HEAP *H){
     int tempIndex = 1; //starting traversal index
 	H->heap[tempIndex] = temp;
     int key = H->heap[tempIndex]; //keep track of the key that will be swapped
-	printf("%d", H->size);
     while(tempIndex < H->size){ //it ends when the it is already in the correct position
 		temp = H->heap[tempIndex];
 		if(tempIndex*2 > H->size){
@@ -120,7 +119,6 @@ int deleteM(HEAP *H){
 		//If there is only one child (or the child is the last leaf node):
 
 		if(tempIndex*2 == H->size){ //Checks whether there is only one child
-			printf("a\n");
 			if(H->heap[tempIndex] > H->heap[tempIndex*2]){ //If parent is greater than child
 				H->heap[tempIndex] = H->heap[tempIndex*2]; //swap
 				H->heap[tempIndex*2] = temp;
@@ -135,8 +133,6 @@ int deleteM(HEAP *H){
 		//Check first which is smaller , the left or the right.
 		if(H->heap[tempIndex*2] < H->heap[tempIndex*2+1]){ //If the left is smaller
 			//Check if parent is greater than the left:
-			printf("b\n");
-				printf("%d and %d \n", H->heap[tempIndex], H->heap[tempIndex*2]);
 
 			if(H->heap[tempIndex] > H->heap[tempIndex*2]){
 				H->heap[tempIndex] = H->heap[tempIndex*2];
@@ -144,13 +140,10 @@ int deleteM(HEAP *H){
 				tempIndex = tempIndex*2;
 			}
 			else{ //If not, then break since the parent has found its position
-			printf("f\n");
 				break;
 			}
 		}
 		else{ //The right is smaller
-			printf("c\n");
-			printf("%d and %d \n", H->heap[tempIndex], H->heap[(tempIndex*2)+1]);
 			//Check if parent is greater than the right:
 			if(H->heap[tempIndex] > H->heap[(tempIndex*2)+1]){
 				H->heap[tempIndex] = H->heap[(tempIndex*2)+1];
@@ -165,9 +158,6 @@ int deleteM(HEAP *H){
     H->heap[tempIndex] = temp; //overwrite the root node with the value that was just deleted
     return deleted_key;
 }
-int *heapSort(HEAP *H){
-	return H->heap;
-}
 
 void EprintHeap(HEAP *H){
 	for(int i = 1; i<=H->maxSize; i++){
@@ -175,6 +165,19 @@ void EprintHeap(HEAP *H){
 		printf("%d ", H->heap[i]);
 	}
 
+}
+
+int *heapSort(HEAP *H){
+	//Initialize temporary variables to track the iterations
+	int tempSize = H->size; //Create a placeholder variable for containing the size of our main heap
+	HEAP *tempHeap = createHeap(H->maxSize);
+	tempHeap->size = tempSize;
+	tempHeap->heap = H->heap; //copy its contents
+	int *sorted_array = (int*)malloc((tempSize+1)*sizeof(int));
+	for(int i = tempSize; i >= 1; i--){ //Iterate through the array, then delete accordingly.
+		sorted_array[i]= deleteM(tempHeap);
+	}
+	return sorted_array;
 }
 int main(){
 
@@ -215,8 +218,7 @@ int main(){
 			case '~':
 				printf("The sorted version of the heap:\n");
 				sorted = heapSort(H);
-				for(key=1; key <= H->maxSize; key++){
-					if(sorted[key] == '\0') break;
+				for(key=1; key <= H->size; key++){
 					printf("%4d", sorted[key]);
 				}
 				free(sorted);

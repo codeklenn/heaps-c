@@ -6,4 +6,4 @@ Necessary functions to create:
 - delete()
 - buildHeap()
 - insertion && deletion using minHeap and maxHeap
-- 
+- heapSort()
